@@ -5,11 +5,12 @@ class Client implements Runnable {
 	private int LENGTH_IN = 128;
 	
 	private int SERVER_PORT = 12;
+	private String BROKER_NAME = "Broker";
 
 	@Override
 	public void run() {
 		Broker broker = Task.getBroker();
-		Channel channel = broker.connect("server", SERVER_PORT);
+		Channel channel = broker.connect(BROKER_NAME, SERVER_PORT);
 		
 		byte[] text_out = "Client1".getBytes();
 		assert(!channel.disconnected()) : "Channel is disconnected";
