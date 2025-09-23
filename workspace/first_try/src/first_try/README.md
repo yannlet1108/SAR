@@ -15,9 +15,11 @@
  Ils sont identifiés par une chaîne de caractères et il n'en existe qu'un par JVM.
  
  - Channel accept(int port)
+
  Méthode bloquante qui attend de recevoir des demandes de connexion sur le port passé en paramètre, et renvoie le canal dédié
  
  - Channel connect(String name, int port)
+
  Méthode bloquante qui établit une demande de connexion au Broker représenté par le nom passé en paramètre, sur le port de destination demandé.
  
  Le port est un entier quelconque mais doit être identique entre `connect` et `accept` afin d'établir la connexion.
@@ -29,21 +31,25 @@ Les Channels sont des canaux de communication bidirectionnels en flux d'octets (
 Ils sont transmis aux tâches après l'établissement de la connexion par les brokers.
 
 - int read(byte[] bytes, int offset, int length)
+
 Méthode non bloquante qui permet de recevoir des octets dans le tableau passé en paramètre. 
 Cherche à lire `length` octets à partir de la position `offset`.
 Renvoie le nombre d'octets effectivement lus.
 
 - int write(byte[] bytes, int offset, int length)
+
 Méthode non bloquante qui permet d'écrire des octets dans le tableau passé en paramètre. 
 Cherche à écrire `length` octets à partir de la position `offset`.
 Renvoie le nombre d'octets effectivement écrits.
 
 - void disconnect()
+
 Coupe une connexion entre deux tâches.
 Si une tâche rompt la connexion juste après avoir envoyé des données, les octets envoyés sont reçus puis le recevoir reçoit la notification de fermeture.
 Toute donnée que le receveur voulait envoyer en retour n'est pas envoyée.
 
 - boolean disconnected()
+
 Teste si le canal de communication est déconnecté (à appeler avant de lire ou écrire des données).
 Renvoie True si le canal est déconnecté, False si il est toujours actif.
 
