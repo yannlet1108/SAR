@@ -1,0 +1,17 @@
+ *** SPEC Générale ***
+
+ * Task * 
+ Les Task sont définies avec un Broker (pour communiquer entre différentes tâches) et un Runnable (programme à exécuter)
+ Toutes les Task d'une même JVM possèdent le même Broker.
+
+ * Broker * 
+ Les Broker servent à établir des connexions.
+ Ils sont identifiés par une chaîne de caractères et il n'en existe qu'un par JVM.
+ Un Broker peut soit :
+ - se connecter à un autre Broker (distant ou lui-même) sur un port donné du Broker cible
+ - accepter une demande de connexion sur un de ses ports 
+ Ces deux opérations créent un channel permettant ensuite de communiquer.
+
+ * Channel * 
+Sert à communiquer des bytes. Peuvent écrire et recevoir des bytes dans des array (position de départ et longueur précisées).
+Les channels pouvant terminer une connexion, ils peuvent également vérifier que la communication est toujours active.
