@@ -1,0 +1,35 @@
+@startuml channel
+
+node Accept_channel as "Channel Accept" {
+    portout readA as "read"
+    portout writeA as "write"
+    portout disconnectA as "disconnect"
+    portout disconnectedA as "disconnected"
+
+    component buffer_circulaireA_IN as "buffer_circulaire IN"
+    interface is_disconnectedA as "is_disconnected"
+}
+
+node Connect_channel as "Channel Connect" {
+    portout readC as "read"
+    portout writeC as "write"
+    portout disconnectC as "disconnect"
+    portout disconnectedC as "disconnected"
+
+    component buffer_circulaireC_IN as "buffer_circulaire IN"
+    interface is_disconnectedC as "is_disconnected"
+}
+
+writeC ..> buffer_circulaireA_IN
+disconnectC ..> is_disconnectedA
+disconnectC --> is_disconnectedC
+readC --> buffer_circulaireC_IN
+disconnectedC --> is_disconnectedC
+
+writeA ..> buffer_circulaireC_IN
+disconnectA ..> is_disconnectedC
+disconnectA --> is_disconnectedA
+readA --> buffer_circulaireA_IN
+disconnectedA --> is_disconnectedA
+
+@enduml

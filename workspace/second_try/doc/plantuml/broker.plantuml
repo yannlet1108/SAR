@@ -1,0 +1,36 @@
+@startuml broker
+
+node Broker1 as "Broker1" {
+    portin accept1 as "accept"
+    portout connect1 as "connect"
+}
+
+node Broker2 as "Broker2" {
+    portin accept2 as "accept"
+    portout connect2 as "connect"
+}
+
+database Map1A as "Map RDV 1" {
+    collections collections1N as "Port n"
+    collections collections1P as "Port p"
+}
+
+database Map2A as "Map RDV 2" {
+    collections collections2M as "Port m"
+    collections collections2N as "Port n"
+}
+
+database Annuaire
+
+accept1 --> collections1P : tâche A
+accept1 --> collections1N : tâche B
+connect1 --> collections1P : tâche C
+connect1 --> collections1P : tâche D
+
+accept2 --> collections2M : tâche K
+connect2 --> collections2N : tâche L
+
+connect2 --> Annuaire : tâche M
+Annuaire --> collections1N : tâche M
+
+@enduml

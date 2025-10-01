@@ -1,0 +1,53 @@
+@startuml simple_workflow
+
+node Task1 as "Task1 - Serveur" {
+    portout PortBroker1 as "getBroker"
+    interface Runnable1 as "Runnable"
+}
+
+node Broker1 {
+    portin accept1 as "accept"
+    portout connect1 as "connect"
+}
+
+node ChannelA as "Channel Accept" {
+    portout readA as "read"
+    portout writeA as "write"
+    portout disconnectA as "disconnect"
+    portout disconnectedA as "disconnected"
+
+    component buffer_circulaireA_IN as "buffer_circulaire IN"
+    interface is_disconnectedA as "is_disconnected"
+}
+
+node ChannelC as "Channel Connect" {
+    portout readC as "read"
+    portout writeC as "write"
+    portout disconnectC as "disconnect"
+    portout disconnectedC as "disconnected"
+
+    component buffer_circulaireC_IN as "buffer_circulaire IN"
+    interface is_disconnectedC as "is_disconnected"
+}
+
+node Broker2 {
+    portin accept2 as "accept"
+    portout connect2 as "connect"
+}
+
+node Task2 as "Task2 - Client" {
+    portout PortBroker2 as "getBroker"
+    interface Runnable2 as "Runnable"
+}
+
+
+PortBroker1 --> Broker1
+accept1 --> ChannelA
+
+writeA ..> buffer_circulaireC_IN
+writeC ..> buffer_circulaireA_IN
+
+connect2 --> ChannelC
+PortBroker2 --> Broker2
+
+@enduml
