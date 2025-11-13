@@ -16,36 +16,130 @@
  */
 package info5.sar.channels;
 
+import info5.sar.utils.CircularBuffer;
+
 public class CChannel extends Channel {
 
-  protected CChannel(Broker broker, int port) {
-    super(broker);
-    throw new RuntimeException("NYI");
-  }
+	private volatile boolean isConnected;
 
-  // added for helping debugging applications.
-  public String getRemoteName() {
-    throw new RuntimeException("NYI");
-  }
+	private CChannel otherEndpoint;
+	private CircularBuffer buffer;
 
-  @Override
-  public int read(byte[] bytes, int offset, int length) {
-    throw new RuntimeException("NYI");
-  }
+	private static final int BUFFER_MAX_SIZE = 64;
 
-  @Override
-  public int write(byte[] bytes, int offset, int length) {
-    throw new RuntimeException("NYI");
-  }
+	private int port; // added for helping debugging applications.
 
-  @Override
-  public void disconnect() {
-    throw new RuntimeException("NYI");
-  }
+	protected CChannel(Broker broker, int port) {
+		super(broker);
+		isConnected = true;
+		this.port = port;
+		buffer = new CircularBuffer(BUFFER_MAX_SIZE);
+	}
 
-  @Override
-  public boolean disconnected() {
-    throw new RuntimeException("NYI");
-  }
+	// added for helping debugging applications.
+	public String getRemoteName() {
+		return "Channel from broker : " + broker.getName() + " connected on port : " + port;
+	}
+
+	@Override
+	public int read(byte[] bytes, int offset, int length) {
+
+		if (offset < 0 || length < 0 || offset + length > bytes.length)
+			throw new IllegalArgumentException("Invalid offset or length");
+
+		int read = 0;
+		synchronized (this) {
+			if (!isConnected)
+				throw new IllegalStateException("The channel is disconnected");
+
+			while (buffer.empty()) {
+
+				if (!isConnected) {
+					// Unblocked by disconnect: return 0
+					return 0;
+				}
+				try {
+					wait();
+				} catch (InterruptedException ie) {
+					// Restore interrupt status and continue to check conditions
+					Thread.currentThread().interrupt();
+				}
+			}
+
+			// Read up to "length" bytes or until buffer becomes empty
+			while (read < length && !buffer.empty()) {
+				bytes[offset + read] = buffer.pull();
+				read++;
+				notifyAll();
+			}
+
+		}
+
+		return read;
+	}
+
+	@Override
+	public int write(byte[] bytes, int offset, int length) {
+		// writing on a disconnected channel is illegal
+		if (!isConnected)
+			throw new IllegalStateException("channel is disconnected");
+		return otherEndpoint.receive(bytes, offset, length);
+	}
+
+	private int receive(byte[] bytes, int offset, int length) {
+
+		if (offset < 0 || length < 0 || offset + length > bytes.length)
+			throw new IllegalArgumentException("Invalid offset or length");
+
+		int written = 0;
+
+		synchronized (this) {
+
+			while (buffer.full() && !disconnected()) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					return written;
+				}
+			}
+			if (disconnected()) {
+				return written;
+			}
+			while (length > 0 && !buffer.full()) {
+				buffer.push(bytes[offset + written]);
+				written++;
+				length--;
+			}
+			notifyAll();
+		}
+		return written;
+	}
+
+	@Override
+	public void disconnect() {
+		getDisconnected();
+		otherEndpoint.getDisconnected();
+	}
+
+	private void getDisconnected() {
+		isConnected = false;
+		synchronized (this) {
+			notifyAll();
+		}
+	}
+
+	@Override
+	public boolean disconnected() {
+		return !isConnected;
+	}
+
+	void setPeer(CChannel otherEndpoint) {
+		this.otherEndpoint = otherEndpoint;
+	}
+
+	int getBufferMaxSize() {
+		return BUFFER_MAX_SIZE;
+	}
 
 }

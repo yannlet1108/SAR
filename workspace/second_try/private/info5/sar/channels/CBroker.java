@@ -16,21 +16,91 @@
  */
 package info5.sar.channels;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class CBroker extends Broker {
 
-  public CBroker(String name) {
-    super(name);
-    throw new RuntimeException("NYI");
-  }
+	// For each port with at least a pending connection, the list of current RDVs
+	// If there is one pending accept, it is placed first in the list
+	private final Map<Integer, ArrayList<RDV>> rdvs;
 
-  @Override
-  public Channel accept(int port) {
-    throw new RuntimeException("NYI");
-  }
+	public CBroker(String name) {
+		super(name);
+		BrokerManager.getInstance().addBroker(this);
+		rdvs = new HashMap<>();
+	}
 
-  @Override
-  public Channel connect(String name, int port) {
-    throw new RuntimeException("NYI");
-  }
+	@Override
+	public Channel accept(int port) {
+		RDV rdv;
+		synchronized (rdvs) {
+
+			if (rdvs.containsKey(port)) {
+				RDV firstRDV = rdvs.get(port).get(0);
+				if (firstRDV.getPendingOperation() == PendingOperation.ACCEPT) {
+					throw new IllegalArgumentException(
+							"A Task is already accepting on the port " + port + " of the broker " + getName());
+				} else {
+					rdv = firstRDV;
+					rdvs.get(port).remove(firstRDV); // match found so RDV removed
+					// To clean the map
+					if (rdvs.get(port).size() == 0) {
+						rdvs.remove(port);
+					}
+				}
+			}
+
+			else { // no task is waiting on this port
+				rdv = new RDV(2, PendingOperation.ACCEPT); // 2 threads expected, the 2 endpoints
+				ArrayList<RDV> newList = new ArrayList<RDV>();
+				newList.add(rdv);
+				rdvs.put(port, newList);
+			}
+		}
+		return rdv.come(this, port);
+	}
+
+	@Override
+	public Channel connect(String name, int port) {
+		Broker targetBroker;
+		try {
+			targetBroker = BrokerManager.getInstance().getBroker(name);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+		CBroker targetCBroker = (CBroker) targetBroker;
+		return targetCBroker.addConnect(port);
+	}
+
+	private Channel addConnect(int port) {
+		RDV rdv;
+		synchronized (rdvs) {
+			// if some task are already waiting on this port (accept or connect)
+			if (rdvs.containsKey(port)) {
+				// check if there is one pending accept (first position)
+				RDV firstRDV = rdvs.get(port).get(0);
+				if (firstRDV.getPendingOperation() == PendingOperation.CONNECT) {
+					rdv = new RDV(2, PendingOperation.CONNECT);
+					rdvs.get(port).add(rdv); // added at the end of the connect queue
+				} else {
+					rdv = firstRDV;
+					rdvs.get(port).remove(firstRDV); // match found so RDV removed
+					// To clean the map
+					if (rdvs.get(port).size() == 0) {
+						rdvs.remove(port);
+					}
+				}
+
+			} else { // no task is waiting on this port
+				rdv = new RDV(2, PendingOperation.CONNECT); // 2 threads expected, the 2 endpoints
+				ArrayList<RDV> newList = new ArrayList<RDV>();
+				newList.add(rdv);
+				rdvs.put(port, newList);
+			}
+		}
+		return rdv.come(this, port);
+	}
 
 }
