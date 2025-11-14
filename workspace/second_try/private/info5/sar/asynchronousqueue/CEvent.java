@@ -5,12 +5,10 @@ import java.util.Date;
 public class CEvent implements Event, Comparable<CEvent>{
 
 	private Runnable runnable;
-	private int delay;
 	private Date timeToExecute;
 
 	public CEvent(Runnable runnable, int delay) {
 		this.runnable = runnable;
-		this.delay = delay;
 		timeToExecute = new Date(System.currentTimeMillis() + delay);
 	}
 

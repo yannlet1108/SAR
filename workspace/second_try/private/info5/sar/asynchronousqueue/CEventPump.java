@@ -34,7 +34,7 @@ public class CEventPump extends EventPump {
 
 			synchronized (events) {
 				while (!events.isEmpty()) {
-					CEvent event = (CEvent) events.peek();
+					Event event = events.peek();
 					Date currentTime = new Date(System.currentTimeMillis());
 					if (event.getTimeToExecute().before(currentTime)) {
 						events.remove();

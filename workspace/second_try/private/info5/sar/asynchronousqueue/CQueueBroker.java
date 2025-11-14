@@ -34,7 +34,7 @@ public class CQueueBroker extends QueueBroker {
 	}
 
 	private final Map<Integer, Task> pendingBinds;
-	private CEventPump eventPump;
+	private EventPump eventPump;
 	private Broker broker;
 
 	CQueueBroker(String name) {
@@ -82,7 +82,7 @@ public class CQueueBroker extends QueueBroker {
 		}
 
 		task.interrupt();
-		((CBroker) broker).removeAccept(port);
+		broker.removeAccept(port);
 		return true;
 
 	}
