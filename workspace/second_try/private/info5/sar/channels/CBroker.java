@@ -102,5 +102,16 @@ public class CBroker extends Broker {
 		}
 		return rdv.come(this, port);
 	}
+	
+	public boolean removeAccept(int port) {
+		
+		RDV firstRDV = rdvs.get(port).get(0);
+		if (firstRDV.getPendingOperation() == PendingOperation.CONNECT) {
+			return false; // no pending accept to be removed
+		}
+		
+		rdvs.get(port).remove(firstRDV);
+		return true;
+	}
 
 }

@@ -44,7 +44,8 @@ public class RDV {
 				return secondEndpoint;				
 			}
 		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
+			// Happens when unbind() is called
+			return null;
 		}
 	}
 	

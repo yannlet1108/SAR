@@ -5,15 +5,15 @@ import java.util.Map;
 
 public class BrokerManager {
 
-	private static BrokerManager brokerManager;
+	private static BrokerManager instance;
 
 	private static final Map<String, Broker> brokers = new HashMap<>();
 
 	public static BrokerManager getInstance() {
-		if (brokerManager == null) {
-			brokerManager = new BrokerManager();
+		if (instance == null) {
+			instance = new BrokerManager();
 		}
-		return brokerManager;
+		return instance;
 	}
 
 	public synchronized void addBroker(Broker broker) {
