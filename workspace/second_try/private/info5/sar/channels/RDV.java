@@ -35,8 +35,8 @@ public class RDV {
 			} else {
 				
 				Channel secondEndpoint = new CChannel(broker, port);
-				((CChannel)secondEndpoint).setPeer((CChannel) firstEndpoint);
-				((CChannel)firstEndpoint).setPeer((CChannel) secondEndpoint);
+				secondEndpoint.setPeer(firstEndpoint);
+				firstEndpoint.setPeer(secondEndpoint);
 				
 				rdv.release(nexpected - 1);
 				mutex.release();

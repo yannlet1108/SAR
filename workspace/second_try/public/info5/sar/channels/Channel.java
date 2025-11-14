@@ -34,48 +34,50 @@ package info5.sar.channels;
  * operations will be interrupted when appropriate. 
  */
 public abstract class Channel {
-  Broker broker;
+	Broker broker;
 
-  protected Channel(Broker broker) {
-    this.broker = broker;
-  }
+	protected Channel(Broker broker) {
+		this.broker = broker;
+	}
 
-  // added for helping debugging applications.
-  public abstract String getRemoteName();
-  
-  public Broker getBroker() {
-    return broker;
-  }
+	// added for helping debugging applications.
+	public abstract String getRemoteName();
 
-  /*
-   * Read bytes in the given array, starting at the given offset.
-   * At most "length" bytes will be read. If there are no bytes available, this
-   * method will block until there are bytes available or this channel
-   * becomes disconnected.
-   * 
-   * @returns the number of bytes read, may not be zero.
-   */
-  public abstract int read(byte[] bytes, int offset, int length);
+	public Broker getBroker() {
+		return broker;
+	}
 
-  /*
-   * Write bytes from the given array, starting at the given
-   * offset. At most "length" bytes will be written. If there is no room to write
-   * any byte, this method will block until there is room or this channel
-   * becomes disconnected.
-   * 
-   * @returns the number of bytes written, may not be zero.
-   */
-  public abstract int write(byte[] bytes, int offset, int length);
+	/*
+	 * Read bytes in the given array, starting at the given offset. At most "length"
+	 * bytes will be read. If there are no bytes available, this method will block
+	 * until there are bytes available or this channel becomes disconnected.
+	 * 
+	 * @returns the number of bytes read, may not be zero.
+	 */
+	public abstract int read(byte[] bytes, int offset, int length);
 
-  /*
-   * Thread-safe disconnects this channel, unblocking any task 
-   * blocked in a read or write operation.
-   */
-  public abstract void disconnect();
+	/*
+	 * Write bytes from the given array, starting at the given offset. At most
+	 * "length" bytes will be written. If there is no room to write any byte, this
+	 * method will block until there is room or this channel becomes disconnected.
+	 * 
+	 * @returns the number of bytes written, may not be zero.
+	 */
+	public abstract int write(byte[] bytes, int offset, int length);
 
-  /*
-   * @returns true if this channel is disconnected (thread-safe)
-   */
-  public abstract boolean disconnected();
+	/*
+	 * Thread-safe disconnects this channel, unblocking any task blocked in a read
+	 * or write operation.
+	 */
+	public abstract void disconnect();
+
+	/*
+	 * @returns true if this channel is disconnected (thread-safe)
+	 */
+	public abstract boolean disconnected();
+
+	public abstract void setPeer(Channel otherEndpoint);
+
+	public abstract int getBufferMaxSize();
 
 }

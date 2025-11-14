@@ -134,12 +134,15 @@ public class CChannel extends Channel {
 		return !isConnected;
 	}
 
-	void setPeer(CChannel otherEndpoint) {
-		this.otherEndpoint = otherEndpoint;
+	@Override
+	public void setPeer(Channel otherEndpoint) {
+		this.otherEndpoint = (CChannel)otherEndpoint;
 	}
 
-	int getBufferMaxSize() {
+	@Override
+	public int getBufferMaxSize() {
 		return BUFFER_MAX_SIZE;
 	}
+
 
 }

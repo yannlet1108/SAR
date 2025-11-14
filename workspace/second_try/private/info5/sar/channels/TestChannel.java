@@ -82,9 +82,9 @@ public class TestChannel {
 
 	// Each broker must have a unique name
 	private static boolean test1() {
-		CBroker brokerA = new CBroker("BrokerA");
+		Broker brokerA = new CBroker("BrokerA");
 		try {
-			CBroker brokerB = new CBroker("BrokerA");
+			Broker brokerB = new CBroker("BrokerA");
 			assert false : "Expected exception for duplicate broker name not thrown.";
 		} catch (IllegalArgumentException e) {
 			// Expected exception
@@ -94,22 +94,22 @@ public class TestChannel {
 
 	// Lookup should return the correct broker
 	private static boolean test2() {
-		CBroker brokerC = new CBroker("BrokerC");
-		CBroker foundBroker = (CBroker) BrokerManager.getInstance().getBroker("BrokerC");
+		Broker brokerC = new CBroker("BrokerC");
+		Broker foundBroker = BrokerManager.getInstance().getBroker("BrokerC");
 		assert foundBroker != null && foundBroker.getName().equals("BrokerC") : "Broker lookup failed.";
 		return true;
 	}
 
 	// Connection to a non-existing broker should return null
 	private static boolean test3() {
-		CBroker broker = new CBroker("Broker");
+		Broker broker = new CBroker("Broker");
 		Channel shouldBeNull = broker.connect("NonExistentBroker", 1024);
 		return shouldBeNull == null;
 	}
 
 	// Connection and disconnection general usecase inside the same broker
 	private static boolean test4() {
-		CBroker broker1;
+		Broker broker1;
 
 		try {
 			BrokerManager.getInstance().getBroker("Broker1");
@@ -178,9 +178,9 @@ public class TestChannel {
 	// Double accept on same port should fail
 	private static boolean test5() {
 		if (!BrokerManager.getInstance().isBrokerExisting("Broker1")) {
-			CBroker broker1 = new CBroker("Broker1");
+			Broker broker1 = new CBroker("Broker1");
 		}
-		CBroker broker1 = (CBroker) BrokerManager.getInstance().getBroker("Broker1");
+		Broker broker1 = BrokerManager.getInstance().getBroker("Broker1");
 
 		Task task1 = new Task("Task1", broker1);
 		Task task2 = new Task("Task2", broker1);
@@ -232,9 +232,9 @@ public class TestChannel {
 	// Multiple connections on same port should work
 	private static boolean test6() {
 		if (!BrokerManager.getInstance().isBrokerExisting("Broker1")) {
-			CBroker broker1 = new CBroker("Broker1");
+			Broker broker1 = new CBroker("Broker1");
 		}
-		CBroker broker1 = (CBroker) BrokerManager.getInstance().getBroker("Broker1");
+		Broker broker1 = BrokerManager.getInstance().getBroker("Broker1");
 
 		Task task1 = new Task("Task1", broker1);
 		Task task2 = new Task("Task2", broker1);
@@ -288,14 +288,14 @@ public class TestChannel {
 	// Connection between two different brokers should work
 	private static boolean test7() {
 		if (!BrokerManager.getInstance().isBrokerExisting("Broker1")) {
-			CBroker broker1 = new CBroker("Broker1");
+			Broker broker1 = new CBroker("Broker1");
 		}
-		CBroker broker1 = (CBroker) BrokerManager.getInstance().getBroker("Broker1");
+		Broker broker1 = BrokerManager.getInstance().getBroker("Broker1");
 
 		if (!BrokerManager.getInstance().isBrokerExisting("Broker2")) {
-			CBroker broker2 = new CBroker("Broker2");
+			Broker broker2 = new CBroker("Broker2");
 		}
-		CBroker broker2 = (CBroker) BrokerManager.getInstance().getBroker("Broker2");
+		Broker broker2 = BrokerManager.getInstance().getBroker("Broker2");
 
 		Task task1 = new Task("Task1", broker1);
 		Task task2 = new Task("Task2", broker2);
@@ -337,9 +337,9 @@ public class TestChannel {
 	// Message exchange general usecase test
 	private static boolean test8() {
 		if (!BrokerManager.getInstance().isBrokerExisting("Broker1")) {
-			CBroker broker1 = new CBroker("Broker1");
+			Broker broker1 = new CBroker("Broker1");
 		}
-		CBroker broker1 = (CBroker) BrokerManager.getInstance().getBroker("Broker1");
+		Broker broker1 = BrokerManager.getInstance().getBroker("Broker1");
 
 		Task task1 = new Task("Task1", broker1);
 		Task task2 = new Task("Task2", broker1);
@@ -442,7 +442,7 @@ public class TestChannel {
 		if (BrokerManager.getInstance().getBroker("Broker1") == null) {
 			broker1 = new CBroker("Broker1");
 		} else {
-			broker1 = (CBroker) BrokerManager.getInstance().getBroker("Broker1");
+			broker1 = BrokerManager.getInstance().getBroker("Broker1");
 		}
 
 		Task task1 = new Task("Task1", broker1);
@@ -461,7 +461,7 @@ public class TestChannel {
 
 				String longMessage = "Hello, this is a message longer than the buffer size to test blocking write behavior.";
 				int bytesWritten = channel.write(longMessage.getBytes(), 0, longMessage.length());
-				if (bytesWritten != ( ((CChannel)channel).getBufferMaxSize()) -1)  {
+				if (bytesWritten != ( channel.getBufferMaxSize()) -1)  {
 					System.err.println("ERR: task1: expected to write 64 bytes, but wrote " + bytesWritten + " bytes.");
 				}
 
@@ -513,7 +513,7 @@ public class TestChannel {
 		if (BrokerManager.getInstance().getBroker("Broker1") == null) {
 			broker1 = new CBroker("Broker1");
 		} else {
-			broker1 = (CBroker) BrokerManager.getInstance().getBroker("Broker1");
+			broker1 = BrokerManager.getInstance().getBroker("Broker1");
 		}
 
 		Task task1 = new Task("Task1", broker1);
@@ -556,7 +556,7 @@ public class TestChannel {
 		if (BrokerManager.getInstance().getBroker("Broker1") == null) {
 			broker1 = new CBroker("Broker1");
 		} else {
-			broker1 = (CBroker) BrokerManager.getInstance().getBroker("Broker1");
+			broker1 = BrokerManager.getInstance().getBroker("Broker1");
 		}
 
 		Task task1 = new Task("Task1", broker1);
